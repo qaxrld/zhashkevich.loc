@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      }
+
+      /* Header */
+      header {
+      background-color: #333;
+      color: white;
+      padding: 15px 20px;
+      }
+
+      header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      }
+
+      header a {
+      color: white;
+      text-decoration: none;
+      margin-left: 15px;
+      }
+
+      header a:hover {
+      text-decoration: underline;
+      }
+
+      /* Main */
+      main {
+      padding: 40px 20px;
+      min-height: 70vh;
+      }
+
+      /* Footer */
+      footer {
+      background-color: #f1f1f1;
+      text-align: center;
+      padding: 15px;
+      }
+  </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <h1> сайт</h1>
+        <nav>
+            <a href="#">Главная</a>
+            <a href="#">О нас</a>
+            <a href="#">Контакты</a>
+        </nav>
+    </div>
+</header>
+
+<main>
+
+  {% include content %}
+
+</main>
+
+<footer>
+    <p>© 2026 сайт</p>
+</footer>
+
+</body>
+</html>
