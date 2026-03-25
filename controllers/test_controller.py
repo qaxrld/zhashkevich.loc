@@ -1,9 +1,6 @@
-from views.view import View
+from controllers.controller import Controller
 
-class TestController:
-    def __init__(self):
-        self.layout = "default"
-        self.view =  View(self.layout)
+class TestController(Controller):
 
     def test(self, request, response):
         response.text = self.view.render_html('site/test.html', {'title' : 'тест',
