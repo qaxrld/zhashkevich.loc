@@ -2,9 +2,9 @@
 <ul class="flex-box">
   {% for article in articles %}
   <li class="article">
-    <h2>{{ article.name }}</h2>
-    <p>{{ article.text }}</p>
-    <a href="article/{{article.id}}">Подробнее</a>
+    <h2>{{ article.get_name() }}</h2>
+    <p>{{ article.get_text() }}</p>
+    <a href="article/{{article.get_id}}">Подробнее</a>
   </li>
   <hr>
   {% endfor %}

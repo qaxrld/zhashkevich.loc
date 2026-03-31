@@ -3,6 +3,7 @@ from controllers.site_controller import SiteController
 from controllers.test_controller import TestController
 
 routes = {
+    r"^/article/(\d+)/edit$" : [ArticlesController, ArticlesController.edit],
     r"^/article/(\d+)$" : [ArticlesController, ArticlesController.view],
     r"^/articles$": [ArticlesController, ArticlesController.index],
     r"^/home$" : [SiteController, SiteController.index],
