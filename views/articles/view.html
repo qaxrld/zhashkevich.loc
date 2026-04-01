@@ -3,3 +3,5 @@
   <p>{{ article.text }}</p>
   <p>{{ article.create_at }}</p>
 <a href="/articles">Все статьи</a>
+<a href="article/{{article.get_id()}}/edit">Редактировать</a>
+<a href="article/{{article.get_id()}}/delete">Удалить</a>

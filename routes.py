@@ -3,6 +3,8 @@ from controllers.site_controller import SiteController
 from controllers.test_controller import TestController
 
 routes = {
+    r"^/article/(\d+)/delete$": [ArticlesController, ArticlesController.delete],
+    r"^/articles/add$": [ArticlesController, ArticlesController.add],
     r"^/article/(\d+)/edit$" : [ArticlesController, ArticlesController.edit],
     r"^/article/(\d+)$" : [ArticlesController, ArticlesController.view],
     r"^/articles$": [ArticlesController, ArticlesController.index],
@@ -11,5 +13,4 @@ routes = {
     r"^/test$" :  [TestController, TestController.test],
     r"^/test-action$" :  [TestController, TestController.action],
     r"^/hello/(.*)$": [SiteController, SiteController.hello],
-
 }
