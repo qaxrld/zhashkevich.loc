@@ -21,7 +21,7 @@ class ArticlesController(Controller):
         response.text = self.view.render_html('articles/view.html', {'title' : f'MVC фреймворк - {article.get_name()}',
                                                                      'h1' : f'Статья: {article.get_name()} ',
                                                                      'article' : article,
-                                                                     'user' : user})
+                                                                     })
 
 
     def edit(self, request, response, id):
