@@ -2,6 +2,7 @@
   <h2>{{ article.name }}</h2>
   <p>{{ article.text }}</p>
   <p>{{ article.create_at }}</p>
+  <p>Автор: {{ user.get_nickname() }}</p>
 <a href="/articles">Все статьи</a>
 <a href="article/{{article.get_id()}}/edit">Редактировать</a>
 <a href="article/{{article.get_id()}}/delete">Удалить</a>

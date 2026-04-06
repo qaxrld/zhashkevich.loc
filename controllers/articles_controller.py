@@ -1,6 +1,7 @@
 from controllers.controller import Controller
 from handlers import articles
 from models.article import Article
+from models.user import User
 from exceptions import NotFoundException
 
 class ArticlesController(Controller):
@@ -16,8 +17,11 @@ class ArticlesController(Controller):
         if article is None:
             raise NotFoundException('Статья не найдена')
 
-
-        response.text = self.view.render_html('articles/view.html', {'title' : f'MVC фреймворк - {article.get_name()}', 'h1' : f'Статья: {article.get_name()} ', 'article' : article})
+        user = User.get_by_id(article.get_author_id())
+        response.text = self.view.render_html('articles/view.html', {'title' : f'MVC фреймворк - {article.get_name()}',
+                                                                     'h1' : f'Статья: {article.get_name()} ',
+                                                                     'article' : article,
+                                                                     'user' : user})
 
 
     def edit(self, request, response, id):
