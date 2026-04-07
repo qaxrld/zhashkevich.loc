@@ -9,6 +9,7 @@ routes = {
     r"^/article/(\d+)$" : [ArticlesController, ArticlesController.view],
     r"^/articles$": [ArticlesController, ArticlesController.index],
     r"^/user/register$": [UsersController, UsersController.sign_up],
+    r"^/user/login$": [UsersController, UsersController.sign_in],
     r"^/home$" : [SiteController, SiteController.index],
     r"^/about$" :  [SiteController, SiteController.about],
     r"^/test$" :  [TestController, TestController.test],

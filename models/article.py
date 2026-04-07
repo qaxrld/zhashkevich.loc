@@ -18,7 +18,8 @@ class Article(ActiveRecordEntity):
     def get_create_at(self, create_at):
         return self._create_at
     def get_author(self):
-        return User.get_by_id(self._id)
+        return User.get_by_id(self._author_id)
+
 
     def set_author_id(self, author_id):
         self._author_id = author_id
