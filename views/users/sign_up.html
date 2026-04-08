@@ -10,7 +10,7 @@
       <label for="inputName" class="form-label">Логин</label>
       <input type="text" id="inputName" class="form-control" name="nickname"
       {% if user %}
-        value="{{user.nickname}}"
+        value="{{user_data.nickname}}"
       {% endif %}
       >
     </div>
@@ -18,7 +18,7 @@
       <label for="inputEmail" class="form-label">Почта</label>
       <input type="email" id="inputEmail" class="form-control" name="email"
       {% if user %}
-        value="{{user.email}}"
+        value="{{user_data.email}}"
       {% endif %}
       >
     </div>

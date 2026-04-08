@@ -17,7 +17,7 @@ class UsersController(Controller):
                     return
             except InvalidArgumentException as e:
                 response.text = self.view.render_html('users/sign_up.html', {'title': 'Регистрация',
-                                                                             'user' :request.POST,
+                                                                             'user_data' :request.POST,
                                                                              'error' : e})
                 return
 
@@ -35,9 +35,14 @@ class UsersController(Controller):
                     return
             except InvalidArgumentException as e:
                 response.text = self.view.render_html('users/sign_in.html', {'title': 'Вход',
-                                                                             'user': request.POST,
+                                                                             'user_data': request.POST,
                                                                              'error': e})
                 return
 
         response.text = self.view.render_html('users/sign_in.html', {'title' : 'Вход',})
+
+    def logout(self, request, response):
+        response.set_cookie('token', '', -1, '/')
+        response.status_code = 302
+        response.location = request.referer
 

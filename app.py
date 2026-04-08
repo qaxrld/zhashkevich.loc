@@ -3,7 +3,7 @@ import re
 from webob import Request, Response
 from whitenoise import WhiteNoise
 import routes
-from exceptions import NotFoundException
+from exceptions import NotFoundException, UnauthorizedException
 from views.view import View
 
 
@@ -29,7 +29,7 @@ class API:
             if result is None:
                 raise NotFoundException('Страница не найдена')
             handler, params = result
-            controller = handler[0]()
+            controller = handler[0](request)
             action = handler[1]
             action(controller, request, response, *params)
 
@@ -38,6 +38,10 @@ class API:
         except NotFoundException as e:
             response.status_code = 404
             response.text = View('default').render_html('errors/404.html', {'error' :  e})
+
+        except UnauthorizedException as e:
+            response.status_code = 401
+            response.text = View('default').render_html('errors/401.html', {'error' :  e})
 
         return response
 

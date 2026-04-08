@@ -9,8 +9,8 @@
     <div class="mb-3">
       <label for="inputName" class="form-label">Логин</label>
       <input type="text" id="inputName" class="form-control" name="nickname"
-      {% if user %}
-        value="{{user.nickname}}"
+      {% if user_data %}
+        value="{{user_data.nickname}}"
       {% endif %}
       >
     </div>

@@ -2,7 +2,8 @@ from controllers.controller import Controller
 from handlers import articles
 from models.article import Article
 from models.user import User
-from exceptions import NotFoundException
+from exceptions import NotFoundException, UnauthorizedException
+
 
 class ArticlesController(Controller):
 
@@ -10,7 +11,9 @@ class ArticlesController(Controller):
         articles = Article.find_all()
         print(articles)
         response.text = self.view.render_html('articles/index.html', {'title' : 'Статьи',
-                                                                    'h1' : 'Статьи на сайте', 'articles' : articles})
+                                                                      'h1' : 'Статьи на сайте',
+                                                                      'articles' : articles,
+                                                                      })
 
     def view(self, request, response, id):
         article = Article.get_by_id(id)
@@ -28,6 +31,9 @@ class ArticlesController(Controller):
         article = Article.get_by_id(id)
         if article is None:
             raise NotFoundException('Статья не найдена')
+
+        if self.user is None:
+            raise UnauthorizedException('Необходимо авторизоваться')
 
 
 
