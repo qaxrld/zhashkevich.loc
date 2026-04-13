@@ -1,8 +1,13 @@
+import cgi
+
+
+
 from controllers.controller import Controller
 from handlers import articles
 from models.article import Article
 from models.user import User
 from exceptions import NotFoundException, UnauthorizedException
+from exceptions import InvalidArgumentException
 
 
 class ArticlesController(Controller):
@@ -35,9 +40,6 @@ class ArticlesController(Controller):
         if self.user is None:
             raise UnauthorizedException('Необходимо авторизоваться')
 
-
-
-
         if request.method == 'POST':
             article.set_name(request.POST['name'])
             article.set_text(request.POST['text'])
@@ -61,10 +63,27 @@ class ArticlesController(Controller):
 
 
     def add(self, request,  response):
-        article = Article()
-        article.set_author_id(1)
-        article.set_name('Новая статья')
-        article.set_text('текст статьи')
+        if self.user is None:
+            raise UnauthorizedException('Необходимо авторизоваться')
 
-        article.save()
 
+        if request.method == 'POST':
+            try:
+                form = cgi.FieldStorage(fp=request.environ['wsgi.input'], environ=request.environ)
+                fields = {
+                    'name' : form.getvalue('name'),
+                    'text': form.getvalue('text'),
+                }
+                img_file = form['img']
+                article = Article.create(fields, img_file, self.user)
+                if isinstance(article, Article):
+                    response.status_code = 302
+                    response.headers = [('Location', '/articles')]
+                    return
+            except InvalidArgumentException as e:
+                response.text = self.view.render_html('articles/add.html', {'title': 'Добавление статьи',
+                                                                             'article_data': fields,
+                                                                             'error': e})
+                return
+
+        response.text = self.view.render_html('articles/add.html',  {'title' : 'Добавление статьи',})

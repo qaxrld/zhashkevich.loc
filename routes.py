@@ -10,6 +10,7 @@ routes = {
     r"^/articles$": [ArticlesController, ArticlesController.index],
     r"^/user/register$": [UsersController, UsersController.sign_up],
     r"^/user/login$": [UsersController, UsersController.sign_in],
+    # r"^/users$": [UsersController, UsersController.users],
     r"^/user/logout$": [UsersController, UsersController.logout],
     r"^/home$" : [SiteController, SiteController.index],
     r"^/about$" :  [SiteController, SiteController.about],

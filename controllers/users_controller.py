@@ -46,3 +46,6 @@ class UsersController(Controller):
         response.status_code = 302
         response.location = request.referer
 
+    # def users(self):
+
+
