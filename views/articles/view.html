@@ -7,6 +7,7 @@
 {% if user and user.get_id() == article.get_author_id() %}
 <a href="/article/{{article.get_id()}}/edit">Редактировать</a>
 <form action="/article/{{article.get_id()}}/delete" method="POST" style="display:inline">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
   <button type="submit">Удалить</button>
 </form>
 {% endif %}

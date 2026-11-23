@@ -3,6 +3,7 @@ import cgi
 
 
 from controllers.controller import Controller
+from models.user_auth_service import UserAuthService
 from handlers import articles
 from models.article import Article
 from models.user import User
@@ -11,6 +12,16 @@ from exceptions import InvalidArgumentException
 
 
 class ArticlesController(Controller):
+    def __init__(self, request):
+        super().__init__(request)
+        self.view.set_var(
+            "csrf_token", UserAuthService.csrf_token_for_user(self.user)
+        )
+
+    def require_csrf_token(self, request):
+        token = request.POST.get("csrf_token", "")
+        if not UserAuthService.is_valid_csrf_token(self.user, token):
+            raise ForbiddenException("Отсутствует или неверен CSRF-токен")
 
     def index(self, request, response):
         articles = Article.find_all()
@@ -46,6 +57,7 @@ class ArticlesController(Controller):
         self.require_article_author(article)
 
         if request.method == 'POST':
+            self.require_csrf_token(request)
             article.set_name(request.POST['name'])
             article.set_text(request.POST['text'])
             article.save()
@@ -63,6 +75,7 @@ class ArticlesController(Controller):
         if article is None:
             raise NotFoundException('Статья не найдена')
         self.require_article_author(article)
+        self.require_csrf_token(request)
 
         article.delete()
         response.status_code = 302

@@ -1,5 +1,7 @@
 import base64
 import binascii
+import hashlib
+import hmac
 
 from werkzeug.security import check_password_hash
 
@@ -24,6 +26,20 @@ class UserAuthService:
         if user is None or user.get_auth_token() != auth_token:
             return None
         return user
+
+    @staticmethod
+    def csrf_token_for_user(user):
+        """Generate a session-bound token without storing it in a file."""
+        if user is None or not user.get_auth_token():
+            return ""
+        secret = user.get_auth_token().encode("utf-8")
+        return hmac.new(secret, b"html-form-csrf-v1", hashlib.sha256).hexdigest()
+
+    @staticmethod
+    def is_valid_csrf_token(user, submitted_token):
+        expected = UserAuthService.csrf_token_for_user(user)
+        return bool(expected and isinstance(submitted_token, str)
+                    and hmac.compare_digest(expected, submitted_token))
 
     @staticmethod
     def get_user_by_auth_basic(request):
