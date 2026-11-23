@@ -6,7 +6,7 @@ from controllers.controller import Controller
 from handlers import articles
 from models.article import Article
 from models.user import User
-from exceptions import NotFoundException, UnauthorizedException
+from exceptions import NotFoundException, UnauthorizedException, ForbiddenException, InvalidMethodException
 from exceptions import InvalidArgumentException
 
 
@@ -32,13 +32,18 @@ class ArticlesController(Controller):
                                                                      })
 
 
+    def require_article_author(self, article):
+        if self.user is None:
+            raise UnauthorizedException('Необходимо авторизоваться')
+        if str(article.get_author_id()) != str(self.user.get_id()):
+            raise ForbiddenException('Нет прав на изменение чужой статьи')
+
     def edit(self, request, response, id):
         article = Article.get_by_id(id)
         if article is None:
             raise NotFoundException('Статья не найдена')
 
-        if self.user is None:
-            raise UnauthorizedException('Необходимо авторизоваться')
+        self.require_article_author(article)
 
         if request.method == 'POST':
             article.set_name(request.POST['name'])
@@ -52,9 +57,12 @@ class ArticlesController(Controller):
 
 
     def delete(self, request, response, id):
+        if request.method != 'POST':
+            raise InvalidMethodException('Удаление доступно только методом POST')
         article = Article.get_by_id(id)
         if article is None:
             raise NotFoundException('Статья не найдена')
+        self.require_article_author(article)
 
         article.delete()
         response.status_code = 302

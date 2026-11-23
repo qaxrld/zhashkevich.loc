@@ -7,8 +7,12 @@
     <p>{{ article.get_author().get_nickname() }}</p>
     <p>{{ article.get_id() }}</p>
     <a href="article/{{article.get_id()}}">Подробнее</a>
-    <a href="article/{{article.get_id()}}/edit">Редактировать</a>
-    <a href="article/{{article.get_id()}}/delete">Удалить</a>
+{% if user and user.get_id() == article.get_author_id() %}
+    <a href="/article/{{article.get_id()}}/edit">Редактировать</a>
+    <form action="/article/{{article.get_id()}}/delete" method="POST" style="display:inline">
+      <button type="submit">Удалить</button>
+    </form>
+    {% endif %}
   </li>
   <hr>
   {% endfor %}

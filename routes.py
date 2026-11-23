@@ -7,7 +7,7 @@ from controllers.api.users_api_controller import UsersApiController
 
 
 routes = {
-    r"^/article/(\d+)/delete$": [ArticlesController, ArticlesController.delete],
+    r"^/article/(\\d+)/delete$": [ArticlesController, {"POST": ArticlesController.delete}],
     r"^/articles/add$": [ArticlesController, ArticlesController.add],
     r"^/article/(\d+)/edit$": [ArticlesController, ArticlesController.edit],
     r"^/article/(\d+)$": [ArticlesController, ArticlesController.view],
