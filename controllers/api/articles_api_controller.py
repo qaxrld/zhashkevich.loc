@@ -64,7 +64,11 @@ class ArticlesApiController(ApiController):
         article.save()
 
         response.status_code = 201
-        response.json = {"message": "Статья добавлена"}
+        response.headers["Location"] = "/api/article/" + str(article.get_id())
+        response.json = {
+            "message": "Статья добавлена",
+            "article": self.article_data(article),
+        }
 
     def edit(self, request, response, id):
         self.require_user()

@@ -91,7 +91,8 @@ class ActiveRecordEntity(metaclass=ABCMeta):
 
         sql = 'INSERT INTO ' + self.__class__.get_table_name() + ' (' + columnsViaSemicolon + ' ) VALUES (' + paramsNamesViaSemicolon + ');'
         db = Db()
-        db.query(sql, params2values, self.__class__)
+        cursor = db.connection.execute(sql, params2values)
+        self._id = cursor.lastrowid
         db.connection.commit()
         db.connection.close()
 
