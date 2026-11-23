@@ -24,7 +24,7 @@ class ActiveRecordEntity(metaclass=ABCMeta):
     def get_by_id(cls, id):
         db = Db()
         table_name = cls.get_table_name()
-        result = db.query(f"SELECT * FROM `{table_name}` WHERE id= {id} ", {}, cls)
+        result = db.query(f"SELECT * FROM `{table_name}` WHERE id = :id", {"id": id}, cls)
         if result != []:
             result = result[0]
         else:
