@@ -14,7 +14,7 @@ def file_item(filename, content):
 
 
 # Минимальный PNG-заголовок для распознавания типа.
-PNG = b"\x89PNG\\r\\n\x1a\\n" + b"\x00" * 32
+PNG = bytes.fromhex("89504e470d0a1a0a") + bytes(32)
 
 
 class UploadTests(unittest.TestCase):
