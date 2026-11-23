@@ -96,7 +96,7 @@ class User(ActiveRecordEntity):
         if user  is None:
             raise InvalidArgumentException('Неверный логин или пароль')
 
-        if check_password_hash(user_data['password'], user.get_password_hash):
+        if not check_password_hash(user.get_password_hash(), user_data['password']):
             raise InvalidArgumentException('Неверный логин или пароль')
 
 

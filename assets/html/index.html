@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Статьи через API</title>
+</head>
+<body>
+  <h1>Статьи</h1>
+  <p>Для добавления и изменения используйте тестовый аккаунт сайта.</p>
+  <label>Логин <input id="login" autocomplete="username"></label>
+  <label>Пароль <input id="password" type="password" autocomplete="current-password"></label>
+
+  <h2>Добавление и редактирование</h2>
+  <form id="article-form">
+    <input id="name" placeholder="Название статьи" required>
+    <textarea id="text" placeholder="Текст статьи" required></textarea>
+    <button type="submit">Сохранить</button>
+    <button type="button" id="cancel">Отмена</button>
+  </form>
+  <p id="message" role="status"></p>
+  <h2>Все статьи</h2>
+  <div id="articles"></div>
+
+  <script>
+    let editingId = null;
+    const form = document.getElementById("article-form");
+    const message = document.getElementById("message");
+
+    async function api(url, options = {}) {
+      const headers = new Headers(options.headers || {});
+      const method = (options.method || "GET").toUpperCase();
+      if (method !== "GET") {
+        const login = document.getElementById("login").value;
+        const password = document.getElementById("password").value;
+        if (login && password) {
+          headers.set("Authorization", "Basic " + btoa(login + ":" + password));
+        }
+      }
+      const response = await fetch(url, { ...options, headers });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "HTTP " + response.status);
+      }
+      return data;
+    }
+
+    async function loadArticles() {
+      const items = await api("/api/articles/");
+      const box = document.getElementById("articles");
+      box.replaceChildren();
+      for (const article of items) {
+        const block = document.createElement("div");
+        const title = document.createElement("h3");
+        const text = document.createElement("p");
+        const edit = document.createElement("button");
+        const del = document.createElement("button");
+        title.textContent = article.name;
+        text.textContent = article.text;
+        edit.textContent = "Редактировать";
+        del.textContent = "Удалить";
+        edit.onclick = () => {
+          editingId = article.id;
+          document.getElementById("name").value = article.name;
+          document.getElementById("text").value = article.text;
+          message.textContent = "Редактируем статью № " + article.id;
+        };
+        del.onclick = async () => {
+          if (!confirm("Удалить статью?")) return;
+          try {
+            await api("/api/articles/" + article.id, { method: "DELETE" });
+            await loadArticles();
+            message.textContent = "Статья удалена";
+          } catch (error) {
+            message.textContent = error.message;
+          }
+        };
+        block.append(title, text, edit, del);
+        box.appendChild(block);
+      }
+    }
+
+    form.onsubmit = async (event) => {
+      event.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const text = document.getElementById("text").value.trim();
+      const method = editingId === null ? "POST" : "PUT";
+      const url = editingId === null ? "/api/articles" : "/api/articles/" + editingId;
+      try {
+        await api(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, text })
+        });
+        editingId = null;
+        form.reset();
+        await loadArticles();
+        message.textContent = "Статья сохранена";
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    };
+
+    document.getElementById("cancel").onclick = () => {
+      editingId = null;
+      form.reset();
+      message.textContent = "";
+    };
+    loadArticles().catch(error => { message.textContent = error.message; });
+  </script>
+</body>
+</html>
