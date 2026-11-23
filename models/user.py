@@ -59,7 +59,7 @@ class User(ActiveRecordEntity):
             raise InvalidArgumentException('Не передан email')
 
         try:
-            validate_email(user_data['email'])
+            validate_email(user_data['email'], check_deliverability=False)
         except EmailNotValidError as e:
             raise InvalidArgumentException('Email некорркетен')
 
