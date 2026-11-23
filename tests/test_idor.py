@@ -1,6 +1,7 @@
 """Проверка прав владельца для обычных HTML-маршрутов."""
 
 import unittest
+from urllib.parse import urlencode
 from unittest.mock import Mock, patch
 from webob import Request
 
@@ -24,12 +25,15 @@ def make_user(user_id):
 
 
 def request(method, url, csrf=False):
-    body = {}
+    fields = {}
     if csrf:
-        body["csrf_token"] = UserAuthService.csrf_token_for_user(make_user(1))
+        fields["csrf_token"] = UserAuthService.csrf_token_for_user(make_user(1))
+    if method == "POST" and url.endswith("/edit"):
+        fields.update({"name": "Test", "text": "Text"})
+    body = urlencode(fields).encode("utf-8") if method == "POST" else b""
     return Request.blank(
         url, method=method, headers={"Cookie": "token=test"},
-        POST=body if method == "POST" else None
+        body=body, content_type="application/x-www-form-urlencoded"
     )
 
 
@@ -89,10 +93,7 @@ class IdorTests(unittest.TestCase):
         with patch.object(UserAuthService, "get_user_by_token", return_value=make_user(1)):
             with patch.object(Article, "get_by_id", return_value=article):
                 with patch.object(Article, "save"):
-                    r = request("POST", "/article/12/edit", csrf=True)
-                    r.POST.add("name", "Test")
-                    r.POST.add("text", "Text")
-                    result = app.handle_request(r)
+                    result = app.handle_request(request("POST", "/article/12/edit", csrf=True))
         self.assertEqual(result.status_code, 302)
 
     def test_owner_can_delete(self):
