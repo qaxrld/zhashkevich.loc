@@ -1,4 +1,4 @@
-
+from models.article import Article
 from controllers.controller import Controller
 from services.db import Db
 
@@ -6,7 +6,7 @@ class SiteController(Controller):
 
     def index(self, request, response):
         db = Db()
-        items = db.query("SELECT * FROM 'articles'")
+        items = db.query("SELECT * FROM articles", cls=Article)
         print(items)
         response.text = self.view.render_html('site/index.html', {'title' : 'MVC фреймворк',
                                                                             'h1' : 'Главная страница'})

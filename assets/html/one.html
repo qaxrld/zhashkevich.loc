@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Статья через API</title>
+</head>
+<body>
+    <h1>Статья через API</h1>
+    <div id="article">Загрузка...</div>
+
+    <script>
+        fetch("/api/article/1")
+            .then(response => response.json())
+            .then(article => {
+                document.getElementById("article").innerHTML = "";
+
+                const title = document.createElement("h2");
+                title.textContent = article.name;
+
+                const text = document.createElement("p");
+                text.textContent = article.text;
+
+                document.getElementById("article")
+                    .append(title, text);
+            })
+            .catch(error => {
+                document.getElementById("article")
+                    .textContent = "Ошибка загрузки статьи";
+            });
+    </script>
+</body>
+</html>

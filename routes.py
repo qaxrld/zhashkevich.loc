@@ -2,6 +2,7 @@ from controllers.articles_controller import ArticlesController
 from controllers.site_controller import SiteController
 from controllers.test_controller import TestController
 from controllers.users_controller import UsersController
+from controllers.api.articles_api_controller import ArticlesApiController
 routes = {
     r"^/article/(\d+)/delete$": [ArticlesController, ArticlesController.delete],
     r"^/articles/add$": [ArticlesController, ArticlesController.add],
@@ -16,4 +17,7 @@ routes = {
     r"^/about$" :  [SiteController, SiteController.about],
     r"^/test$" :  [TestController, TestController.test],
     r"^/test-action$" :  [TestController, TestController.action],
-    r"^/hello/(.*)$": [SiteController, SiteController.hello],}
+    r"^/hello/(.*)$": [SiteController, SiteController.hello],
+    r"^/api/article/(\d+)$": [ArticlesApiController, ArticlesApiController.view],
+    r"^/api/articles/?$": [ArticlesApiController, ArticlesApiController.index],
+    }

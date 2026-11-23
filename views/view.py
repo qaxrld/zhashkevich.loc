@@ -1,4 +1,5 @@
 import os
+import json
 from jinja2 import Environment, FileSystemLoader
 
 class View:
@@ -6,6 +7,9 @@ class View:
         self.layout = layout
         self.extra_vars = {}
         self.env = Environment(loader=FileSystemLoader('views'), autoescape=(["html", "xml"]))
+        
+    def display_json(self, data, code=200):
+        return json.dumps(data, ensure_ascii=False)
 
     def render_html(self, view_name, vars={}):
         layout_file = f"layouts/{self.layout}.html"
