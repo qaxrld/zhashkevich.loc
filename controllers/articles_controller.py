@@ -83,28 +83,32 @@ class ArticlesController(Controller):
 
 
 
-    def add(self, request,  response):
+    def add(self, request, response):
         if self.user is None:
-            raise UnauthorizedException('Необходимо авторизоваться')
+            raise UnauthorizedException("Необходимо авторизоваться")
 
-
-        if request.method == 'POST':
+        if request.method == "POST":
+            self.require_csrf_token(request)
+            form = request.POST
+            fields = {
+                "name": form.get("name", ""),
+                "text": form.get("text", ""),
+            }
+            img_file = form.get("img")
             try:
-                form = cgi.FieldStorage(fp=request.environ['wsgi.input'], environ=request.environ)
-                fields = {
-                    'name' : form.getvalue('name'),
-                    'text': form.getvalue('text'),
-                }
-                img_file = form['img']
                 article = Article.create(fields, img_file, self.user)
-                if isinstance(article, Article):
-                    response.status_code = 302
-                    response.headers = [('Location', '/articles')]
-                    return
-            except InvalidArgumentException as e:
-                response.text = self.view.render_html('articles/add.html', {'title': 'Добавление статьи',
-                                                                             'article_data': fields,
-                                                                             'error': e})
+                response.status_code = 302
+                response.location = "/articles"
+                return
+            except InvalidArgumentException as exc:
+                response.status_code = 400
+                response.text = self.view.render_html(
+                    "articles/add.html",
+                    {"title": "Добавление статьи", "article_data": fields,
+                     "error": exc},
+                )
                 return
 
-        response.text = self.view.render_html('articles/add.html',  {'title' : 'Добавление статьи',})
+        response.text = self.view.render_html(
+            "articles/add.html", {"title": "Добавление статьи"}
+        )

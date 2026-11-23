@@ -1,4 +1,6 @@
 import os
+import imghdr
+import uuid
 
 from models.active_record_entity import ActiveRecordEntity
 from models.user import User
@@ -42,66 +44,70 @@ class Article(ActiveRecordEntity):
 
     @staticmethod
     def create(fields, img_file, author):
-        if not fields['name']:
-            raise InvalidArgumentException('не передано название статьи')
+        name = (fields.get("name") or "").strip()
+        text = (fields.get("text") or "").strip()
+        if not name:
+            raise InvalidArgumentException("Не передано название статьи")
+        if not text:
+            raise InvalidArgumentException("Не передан текст статьи")
 
-        if not fields['text']:
-            raise InvalidArgumentException('не передан текст статьи')
+        file_path = None
+        if img_file is not None and getattr(img_file, "filename", ""):
+            if not hasattr(img_file, "file"):
+                raise InvalidArgumentException("Файл передан неправильно")
+            if not Article.check_file_size(img_file, MAX_FILE_SIZE)[0]:
+                raise InvalidArgumentException("Слишком большой файл (не более 5 МБ)")
 
-        if __class__.check_file_size(img_file, MAX_FILE_SIZE)[0] == False :
-            raise InvalidArgumentException('Слишком большой файл! Должно быть не более 5МБ')
+            # Проверяем содержимое, а не только имя или Content-Type.
+            img_file.file.seek(0)
+            header = img_file.file.read(512)
+            img_file.file.seek(0)
+            detected = imghdr.what(None, header)
+            allowed = {"png": ".png", "jpeg": ".jpg", "gif": ".gif"}
+            if detected not in allowed:
+                raise InvalidArgumentException("Можно загружать только PNG, JPG и GIF")
 
-
-        article = Article()
-        article._title = fields['name']
-        article._text = fields['text']
-        article._author_id = author.get_id()
-
-        if img_file.filename:
-            file_path = 'uploads/' +  img_file.filename
-            article._img = file_path
-            os.makedirs('/uploads', exist_ok=True)
-            with open(file_path, 'wb') as f:
+            # Не используем переданное пользователем имя файла.
+            os.makedirs("uploads", exist_ok=True)
+            file_path = os.path.join(
+                "uploads", uuid.uuid4().hex + allowed[detected]
+            )
+            with open(file_path, "xb") as out_file:
                 while True:
-                    chunk = img_file.file.read(8192)  # Читаем файл по частям
+                    chunk = img_file.file.read(8192)
                     if not chunk:
                         break
-                    f.write(chunk)
+                    out_file.write(chunk)
 
-        article.save()
+        article = Article()
+        article.set_name(name)
+        article.set_text(text)
+        article.set_author_id(author.get_id())
+        if file_path:
+            article._img = file_path
+
+        try:
+            article.save()
+        except Exception:
+            if file_path and os.path.exists(file_path):
+                os.remove(file_path)
+            raise
         return article
-
-
-
 
     @staticmethod
     def check_file_size(file_item, max_size):
-        """
-        Проверка размера файла без загрузки всего файла в память.
-        Читает файл по частям и суммирует их размер.
-        """
-        total_size = 0
-        chunk_size = 8192  # Читаем по 8KB
-
-        # Сохраняем текущую позицию, чтобы потом вернуться
-        current_pos = file_item.file.tell()
-
+        stream = file_item.file
+        original_position = stream.tell()
         try:
-            # Перемещаемся в начало файла
-            file_item.file.seek(0)
-
-            # Читаем файл по частям и суммируем размер
+            stream.seek(0)
+            total_size = 0
             while True:
-                chunk = file_item.file.read(chunk_size)
+                chunk = stream.read(8192)
                 if not chunk:
                     break
                 total_size += len(chunk)
-
-                # Если уже превысили лимит, можно прервать проверку
                 if total_size > max_size:
                     break
+            return total_size <= max_size, total_size
         finally:
-            # Возвращаемся на исходную позицию для последующего чтения
-            file_item.file.seek(current_pos)
-        print(total_size)
-        return total_size <= max_size, total_size
+            stream.seek(original_position)

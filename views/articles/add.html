@@ -1,25 +1,27 @@
-
 <h1>Создание статьи</h1>
-
 <a href="/articles">Все статьи</a>
-<br>
-<br>
+
+{% if error %}
+<p role="alert" style="color: crimson;">{{ error }}</p>
+{% endif %}
 
 <div class="m-3 col-md-6">
-  <form action="" method="POST" enctype="multipart/form-data">
+  <form action="/articles/add" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <div class="mb-3">
       <label for="inputName" class="form-label">Заголовок статьи</label>
-      <input type="text" class="form-control" id="inputName" name="name">
+      <input type="text" class="form-control" id="inputName" name="name"
+             value="{{ article_data.name if article_data else '' }}" required>
     </div>
     <div class="mb-3">
-      <label for="inputName" class="form-label">Текст статьи</label>
-      <input type="text" class="form-control" id="inputText" name="name">
+      <label for="inputText" class="form-label">Текст статьи</label>
+      <textarea class="form-control" id="inputText" name="text" required>{{ article_data.text if article_data else '' }}</textarea>
     </div>
     <div class="mb-3">
-      <label for="inputName" class="form-label">Изображение</label>
-      <input type="file" class="form-control" id="inputImg" name="name">
+      <label for="inputImg" class="form-label">Изображение (необязательно, PNG/JPG/GIF, до 5 МБ)</label>
+      <input type="file" class="form-control" id="inputImg" name="img"
+             accept=".png,.jpg,.jpeg,.gif,image/png,image/jpeg,image/gif">
     </div>
     <input type="submit" class="btn btn-primary" value="Создать статью">
   </form>
 </div>
-</form>
